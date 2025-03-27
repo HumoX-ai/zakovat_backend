@@ -1,0 +1,563 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Zakovat Quiz Manager API",
+    "description": "API for managing quizzes, teams, questions, and answers in a quiz game.",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local development server"
+    }
+  ],
+  "paths": {
+    "/api/quiz": {
+      "post": {
+        "summary": "Create a new quiz",
+        "tags": ["Quiz"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuizRequest"
+              },
+              "example": {
+                "name": "Matematika Zakovat 2025"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Quiz created successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Quiz"
+                },
+                "example": {
+                  "_id": "660f123456789abcde123456",
+                  "name": "Matematika Zakovat 2025",
+                  "code": "X7K9P2",
+                  "questions": [],
+                  "isActive": false
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/quiz/{code}": {
+      "get": {
+        "summary": "Get quiz by code",
+        "tags": ["Quiz"],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "X7K9P2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Quiz details",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Quiz"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Quiz not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/quiz/{code}/activate": {
+      "post": {
+        "summary": "Activate a quiz",
+        "tags": ["Quiz"],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "X7K9P2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Quiz activated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "quiz": { "$ref": "#/components/schemas/Quiz" }
+                  }
+                },
+                "example": {
+                  "message": "Musobaqa aktivlashtirildi",
+                  "quiz": {
+                    "_id": "660f123456789abcde123456",
+                    "name": "Matematika Zakovat 2025",
+                    "code": "X7K9P2",
+                    "questions": [],
+                    "isActive": true
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Quiz already active",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Quiz not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/quiz/{code}/deactivate": {
+      "post": {
+        "summary": "Deactivate a quiz",
+        "tags": ["Quiz"],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "X7K9P2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Quiz deactivated",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "quiz": { "$ref": "#/components/schemas/Quiz" }
+                  }
+                },
+                "example": {
+                  "message": "Musobaqa deaktivlashtirildi",
+                  "quiz": {
+                    "_id": "660f123456789abcde123456",
+                    "name": "Matematika Zakovat 2025",
+                    "code": "X7K9P2",
+                    "questions": [],
+                    "isActive": false
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Quiz already inactive",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Quiz not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/team": {
+      "post": {
+        "summary": "Add a team to a quiz",
+        "tags": ["Team"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTeamRequest"
+              },
+              "example": {
+                "quizCode": "X7K9P2",
+                "teamName": "Yulduzlar"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Team added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Team"
+                },
+                "example": {
+                  "_id": "660f123456789abcde123789",
+                  "quizId": "660f123456789abcde123456",
+                  "name": "Yulduzlar",
+                  "score": 0
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Quiz not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/question": {
+      "post": {
+        "summary": "Add a question to a quiz",
+        "tags": ["Question"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateQuestionRequest"
+              },
+              "example": {
+                "quizCode": "X7K9P2",
+                "questionText": "2 + 2 nechchi?",
+                "timeLimit": 30
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Question added successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Question"
+                },
+                "example": {
+                  "_id": "660f123456789abcde123abc",
+                  "quizId": "660f123456789abcde123456",
+                  "text": "2 + 2 nechchi?",
+                  "timeLimit": 30
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Quiz not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/answer": {
+      "post": {
+        "summary": "Submit an answer",
+        "tags": ["Answer"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAnswerRequest"
+              },
+              "example": {
+                "quizCode": "X7K9P2",
+                "teamId": "660f123456789abcde123789",
+                "questionId": "660f123456789abcde123abc",
+                "answer": "4"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Answer submitted successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "answer": { "$ref": "#/components/schemas/Answer" }
+                  }
+                },
+                "example": {
+                  "message": "Javob qabul qilindi",
+                  "answer": {
+                    "_id": "660f123456789abcde123def",
+                    "quizId": "660f123456789abcde123456",
+                    "teamId": "660f123456789abcde123789",
+                    "questionId": "660f123456789abcde123abc",
+                    "answer": "4",
+                    "isCorrect": null
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Quiz is not active",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Quiz not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/answer/{answerId}": {
+      "patch": {
+        "summary": "Moderate an answer",
+        "tags": ["Answer"],
+        "parameters": [
+          {
+            "name": "answerId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "660f123456789abcde123def"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModerateAnswerRequest"
+              },
+              "example": {
+                "isCorrect": true
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Answer moderated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "answer": { "$ref": "#/components/schemas/Answer" },
+                    "team": { "$ref": "#/components/schemas/Team" }
+                  }
+                },
+                "example": {
+                  "message": "Javob moderatsiya qilindi",
+                  "answer": {
+                    "_id": "660f123456789abcde123def",
+                    "quizId": "660f123456789abcde123456",
+                    "teamId": "660f123456789abcde123789",
+                    "questionId": "660f123456789abcde123abc",
+                    "answer": "4",
+                    "isCorrect": true
+                  },
+                  "team": {
+                    "_id": "660f123456789abcde123789",
+                    "quizId": "660f123456789abcde123456",
+                    "name": "Yulduzlar",
+                    "score": 1
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Answer not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Quiz": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "name": { "type": "string" },
+          "code": { "type": "string" },
+          "questions": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "isActive": { "type": "boolean" }
+        }
+      },
+      "Team": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "quizId": { "type": "string" },
+          "name": { "type": "string" },
+          "score": { "type": "number" }
+        }
+      },
+      "Question": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "quizId": { "type": "string" },
+          "text": { "type": "string" },
+          "timeLimit": { "type": "number" }
+        }
+      },
+      "Answer": {
+        "type": "object",
+        "properties": {
+          "_id": { "type": "string" },
+          "quizId": { "type": "string" },
+          "teamId": { "type": "string" },
+          "questionId": { "type": "string" },
+          "answer": { "type": "string" },
+          "isCorrect": { "type": "boolean", "nullable": true }
+        }
+      },
+      "CreateQuizRequest": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" }
+        },
+        "required": ["name"]
+      },
+      "CreateTeamRequest": {
+        "type": "object",
+        "properties": {
+          "quizCode": { "type": "string" },
+          "teamName": { "type": "string" }
+        },
+        "required": ["quizCode", "teamName"]
+      },
+      "CreateQuestionRequest": {
+        "type": "object",
+        "properties": {
+          "quizCode": { "type": "string" },
+          "questionText": { "type": "string" },
+          "timeLimit": { "type": "number" }
+        },
+        "required": ["quizCode", "questionText", "timeLimit"]
+      },
+      "CreateAnswerRequest": {
+        "type": "object",
+        "properties": {
+          "quizCode": { "type": "string" },
+          "teamId": { "type": "string" },
+          "questionId": { "type": "string" },
+          "answer": { "type": "string" }
+        },
+        "required": ["quizCode", "teamId", "questionId", "answer"]
+      },
+      "ModerateAnswerRequest": {
+        "type": "object",
+        "properties": {
+          "isCorrect": { "type": "boolean" }
+        },
+        "required": ["isCorrect"]
+      },
+      "Error": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" },
+          "error": { "type": "object", "nullable": true }
+        }
+      }
+    }
+  }
+}
