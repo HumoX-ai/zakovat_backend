@@ -20,7 +20,13 @@ app.use(cors({
 }));
 app.use(json());
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+const CSS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css';
+
+const options = {
+customCssUrl: CSS_URL,
+};
+
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
 
 // Routes
 app.use("/api/quiz", quizRoutes);
