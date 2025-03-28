@@ -38,6 +38,9 @@ importers:
       swagger-ui-express:
         specifier: ^5.0.1
         version: 5.0.1(express@4.21.2)
+      url:
+        specifier: ^0.11.4
+        version: 0.11.4
     devDependencies:
       '@types/cors':
         specifier: ^2.8.17
@@ -1489,6 +1492,9 @@ packages:
   pstree.remy@1.1.8:
     resolution: {integrity: sha512-77DZwxQmxKnu3aR542U+X8FypNzbfJ+C5XQDk3uWjWxn6151aIMGthWYRXTqT1E5oJvg+ljaa2OJi+VfvCOQ8w==}
 
+  punycode@1.4.1:
+    resolution: {integrity: sha512-jmYNElW7yvO7TV33CjSmvSiE2yco3bV2czu/OzDKdMNVZQWfxCblURLhf+47syQRBntjfLdd/H0egrzIG+oaFQ==}
+
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
@@ -1764,6 +1770,10 @@ packages:
     hasBin: true
     peerDependencies:
       browserslist: '>= 4.21.0'
+
+  url@0.11.4:
+    resolution: {integrity: sha512-oCwdVC7mTuWiPyjLUz/COz5TLk6wgp0RCsN+wHZ2Ekneac9w8uuV0njcbbie2ME+Vs+d6duwmYuR3HgQXs1fOg==}
+    engines: {node: '>= 0.4'}
 
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
@@ -3601,6 +3611,8 @@ snapshots:
 
   pstree.remy@1.1.8: {}
 
+  punycode@1.4.1: {}
+
   punycode@2.3.1: {}
 
   pure-rand@6.1.0: {}
@@ -3873,6 +3885,11 @@ snapshots:
       browserslist: 4.24.4
       escalade: 3.2.0
       picocolors: 1.1.1
+
+  url@0.11.4:
+    dependencies:
+      punycode: 1.4.1
+      qs: 6.13.0
 
   util-deprecate@1.0.2: {}
 
