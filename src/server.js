@@ -7,6 +7,7 @@ import teamRoutes from "./routes/teamRoutes.js";
 import questionRoutes from "./routes/questionRoutes.js";
 import answerRoutes from "./routes/answerRoutes.js";
 import swaggerUi from "swagger-ui-express";
+import { SwaggerUIBundle, SwaggerUIStandalonePreset } from 'swagger-ui-dist'
 import swaggerDocument from "../swagger.json" with { type: "json" };
 dotenv.config();
 
@@ -20,13 +21,10 @@ app.use(cors({
 }));
 app.use(json());
 
-const CSS_URL = 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css';
 
-const options = {
-customCssUrl: CSS_URL,
-};
-
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, options));
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+  customCssUrl:"https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css",
+}));
 
 // Routes
 app.use("/api/quiz", quizRoutes);
