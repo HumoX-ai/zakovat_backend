@@ -8,14 +8,7 @@ import questionRoutes from "./routes/questionRoutes.js";
 import answerRoutes from "./routes/answerRoutes.js";
 import swaggerUi from "swagger-ui-express";
 import swaggerDocument from "../swagger.json" with { type: "json" };
-import path from "path"; // Bu import qo‘shiladi
-import { fileURLToPath } from "url"; // ES modullar uchun qo‘shiladi
-
 dotenv.config();
-
-// ES modullar uchun __dirname ekvivalentini olish
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 const PORT = process.env.PORT || 8080;
@@ -27,10 +20,9 @@ app.use(cors({
 }));
 app.use(json());
 
-// Swagger UI statik fayllarini xizmat qilish
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
-// Marshrutlar
+// Routes
 app.use("/api/quiz", quizRoutes);
 app.use("/api/team", teamRoutes);
 app.use("/api/question", questionRoutes);
