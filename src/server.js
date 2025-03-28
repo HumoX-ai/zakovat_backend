@@ -9,6 +9,7 @@ import answerRoutes from "./routes/answerRoutes.js";
 import swaggerUi from "swagger-ui-express";
 import { SwaggerUIBundle, SwaggerUIStandalonePreset } from 'swagger-ui-dist'
 import swaggerDocument from "../swagger.json" with { type: "json" };
+import swaggerJSDoc from "swagger-jsdoc";
 dotenv.config();
 
 const app = express();
@@ -21,8 +22,11 @@ app.use(cors({
 }));
 app.use(json());
 
+const swaggerSpec = swaggerJSDoc({
+  swaggerDefinition: swaggerDocument,apis: ["./src/routes/*.js"],
+});
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument, {
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
   customCssUrl:"https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css",
 }));
 
