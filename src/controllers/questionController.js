@@ -2,7 +2,7 @@ import Question from "../models/Question.js";
 import Quiz from "../models/Quiz.js";
 
 const addQuestion = async (req, res) => {
-  const { quizCode, questionText, timeLimit } = req.body;
+  const { quizCode, questionText, timeLimit, points } = req.body;
 
   try {
     const quiz = await Quiz.findOne({ code: quizCode });
@@ -14,6 +14,7 @@ const addQuestion = async (req, res) => {
       quizId: quiz._id,
       text: questionText,
       timeLimit,
+      points: points || 1,
     });
     await newQuestion.save();
 

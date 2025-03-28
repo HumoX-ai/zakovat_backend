@@ -1,4 +1,6 @@
+// /src/controllers/answerController.js
 import Answer from "../models/Answer.js";
+import Question from "../models/Question.js";
 import Quiz from "../models/Quiz.js";
 import Team from "../models/Team.js";
 
@@ -11,9 +13,15 @@ const submitAnswer = async (req, res) => {
       return res.status(404).json({ message: "Musobaqa topilmadi" });
     }
 
-    // Musobaqa aktivligini tekshirish
     if (!quiz.isActive) {
       return res.status(403).json({ message: "Musobaqa aktiv emas" });
+    }
+
+    const existingAnswer = await Answer.findOne({ teamId, questionId });
+    if (existingAnswer) {
+      return res.status(400).json({
+        message: "Bu jamoa ushbu savolga allaqachon javob bergan",
+      });
     }
 
     const newAnswer = new Answer({
@@ -30,7 +38,6 @@ const submitAnswer = async (req, res) => {
   }
 };
 
-// Yangi funksiya: Javobni moderatsiya qilish
 const moderateAnswer = async (req, res) => {
   const { answerId } = req.params;
   const { isCorrect } = req.body;
@@ -46,8 +53,24 @@ const moderateAnswer = async (req, res) => {
 
     if (isCorrect) {
       const team = await Team.findById(answer.teamId);
-      if (team) {
-        team.score += 1;
+      const question = await Question.findById(answer.questionId);
+      if (team && question) {
+        // Turnir uchun ballni yangilash
+        const quizScore = team.quizScores.find(
+          (qs) => qs.quizId.toString() === answer.quizId.toString()
+        );
+
+        if (quizScore) {
+          // Agar turnir uchun ball allaqachon mavjud bo‘lsa, qo‘shish
+          quizScore.score += question.points;
+        } else {
+          // Agar turnir uchun ball yo‘q bo‘lsa, yangi qo‘shish
+          team.quizScores.push({
+            quizId: answer.quizId,
+            score: question.points,
+          });
+        }
+
         await team.save();
       }
     }

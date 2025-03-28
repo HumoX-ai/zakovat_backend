@@ -9,6 +9,10 @@
     {
       "url": "http://localhost:8080",
       "description": "Local development server"
+    },
+    {
+      "url": "https://zakovat-backend.vercel.app",
+      "description": "Production server"
     }
   ],
   "paths": {
@@ -82,6 +86,57 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Quiz"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Quiz not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a quiz",
+        "tags": ["Quiz"],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "example": "X7K9P2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Quiz deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "quiz": { "$ref": "#/components/schemas/Quiz" }
+                  }
+                },
+                "example": {
+                  "message": "Musobaqa o'chirildi",
+                  "quiz": {
+                    "_id": "660f123456789abcde123456",
+                    "name": "Matematika Zakovat 2025",
+                    "code": "X7K9P2",
+                    "questions": [],
+                    "isActive": false
+                  }
                 }
               }
             }
@@ -225,37 +280,61 @@
         }
       }
     },
-    "/api/team": {
-      "post": {
-        "summary": "Add a team to a quiz",
-        "tags": ["Team"],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateTeamRequest"
-              },
-              "example": {
-                "quizCode": "X7K9P2",
-                "teamName": "Yulduzlar"
+
+    "/api/quiz/{code}/stats": {
+      "get": {
+        "summary": "Get general quiz statistics",
+        "tags": ["Statistics"],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "X7K9P2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Quiz statistics",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/QuizStats" }
+              }
+            }
+          },
+          "404": {
+            "description": "Quiz not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
               }
             }
           }
-        },
+        }
+      }
+    },
+    "/api/quiz/{code}/team-stats": {
+      "get": {
+        "summary": "Get team statistics for a quiz",
+        "tags": ["Statistics"],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "X7K9P2"
+          }
+        ],
         "responses": {
-          "201": {
-            "description": "Team added successfully",
+          "200": {
+            "description": "Team statistics",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Team"
-                },
-                "example": {
-                  "_id": "660f123456789abcde123789",
-                  "quizId": "660f123456789abcde123456",
-                  "name": "Yulduzlar",
-                  "score": 0
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/TeamStats" }
                 }
               }
             }
@@ -264,8 +343,440 @@
             "description": "Quiz not found",
             "content": {
               "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/quiz/{code}/question-stats": {
+      "get": {
+        "summary": "Get question statistics for a quiz",
+        "tags": ["Statistics"],
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "example": "X7K9P2"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Question statistics",
+            "content": {
+              "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Error"
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/QuestionStats" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Quiz not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/team/create": {
+      "post": {
+        "summary": "Create a new team",
+        "tags": ["Team"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/CreateTeamRequest" },
+              "example": {
+                "teamName": "Yulduzlar",
+                "username": "yulduzlar",
+                "password": "123456"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Team created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "team": {
+                      "type": "object",
+                      "properties": {
+                        "id": { "type": "string" },
+                        "name": { "type": "string" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Team already exists",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/team/admin/dashboard": {
+      "get": {
+        "summary": "Get admin dashboard data",
+        "tags": ["Admin"],
+        "security": [{ "ApiKeyAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Admin dashboard data",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "totalTeams": { "type": "number" },
+                    "totalQuizzes": { "type": "number" },
+                    "teams": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Team" }
+                    },
+                    "quizzes": {
+                      "type": "array",
+                      "items": { "$ref": "#/components/schemas/Quiz" }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/team/login": {
+      "post": {
+        "summary": "Login a team",
+        "tags": ["Team"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string" },
+                  "password": { "type": "string" }
+                }
+              },
+              "example": { "username": "yulduzlar", "password": "123456" }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Login successful",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "team": { "$ref": "#/components/schemas/Team" },
+                    "token": { "type": "string" }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid username or password",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "404": {
+            "description": "Team not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/team/join": {
+      "post": {
+        "summary": "Join a quiz",
+        "security": [{ "BearerAuth": [] }],
+        "tags": ["Team"],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "teamId": { "type": "string" },
+                  "quizCode": { "type": "string" }
+                }
+              },
+              "example": {
+                "teamId": "660f123456789abcde123789",
+                "quizCode": "X7K9P2"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Team joined quiz",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "team": { "$ref": "#/components/schemas/Team" }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid teamId or quizCode",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "404": {
+            "description": "Team or quiz not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/team/": {
+      "get": {
+        "summary": "Get all teams",
+        "tags": ["Team"],
+        "responses": {
+          "200": {
+            "description": "List of teams",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Team" }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No teams found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/team/{teamId}/quiz/{quizId}/score": {
+      "get": {
+        "summary": "Get team score for a specific quiz",
+        "tags": ["Team"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "teamId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID of the team"
+          },
+          {
+            "name": "quizId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID of the quiz"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Team score retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "teamId": { "type": "string" },
+                    "quizId": { "type": "string" },
+                    "score": { "type": "number" }
+                  }
+                },
+                "example": {
+                  "message": "Turnir ballari",
+                  "teamId": "67e598afafc20f01b5370a66",
+                  "quizId": "67e598123456789abc123456",
+                  "score": 10
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Team or quiz score not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/team/{teamId}/quiz/{quizId}/answers": {
+      "get": {
+        "summary": "Get team answers for a specific quiz",
+        "tags": ["Team"],
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "teamId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID of the team"
+          },
+          {
+            "name": "quizId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "ID of the quiz"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Team answers retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "teamId": { "type": "string" },
+                    "quizId": { "type": "string" },
+                    "quizName": { "type": "string" },
+                    "totalScore": { "type": "number" },
+                    "answers": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "questionId": { "type": "string" },
+                          "questionText": { "type": "string" },
+                          "answer": { "type": "string" },
+                          "isCorrect": { "type": "boolean", "nullable": true },
+                          "points": { "type": "number" }
+                        }
+                      }
+                    }
+                  }
+                },
+                "example": {
+                  "message": "Jamoaning turnirdagi javoblari",
+                  "teamId": "67e598afafc20f01b5370a66",
+                  "quizId": "67e598123456789abc123456",
+                  "quizName": "Matematika Zakovat",
+                  "totalScore": 15,
+                  "answers": [
+                    {
+                      "questionId": "67e5999bd724ccfc4de1ec2c",
+                      "questionText": "2 + 2 nechaga teng?",
+                      "answer": "4",
+                      "isCorrect": true,
+                      "points": 10
+                    },
+                    {
+                      "questionId": "67e5999bd724ccfc4de1ec2d",
+                      "questionText": "5 x 3 nechaga teng?",
+                      "answer": "12",
+                      "isCorrect": false,
+                      "points": 0
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Team, quiz, or answers not found",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Error" }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "message": { "type": "string" },
+                    "error": { "type": "string" }
+                  }
                 }
               }
             }
@@ -287,7 +798,8 @@
               "example": {
                 "quizCode": "X7K9P2",
                 "questionText": "2 + 2 nechchi?",
-                "timeLimit": 30
+                "timeLimit": 60,
+                "points": 1
               }
             }
           }
@@ -304,7 +816,8 @@
                   "_id": "660f123456789abcde123abc",
                   "quizId": "660f123456789abcde123456",
                   "text": "2 + 2 nechchi?",
-                  "timeLimit": 30
+                  "timeLimit": 30,
+                  "points": 1
                 }
               }
             }
@@ -325,6 +838,7 @@
     "/api/answer": {
       "post": {
         "summary": "Submit an answer",
+        "security": [{ "BearerAuth": [] }],
         "tags": ["Answer"],
         "requestBody": {
           "required": true,
@@ -353,23 +867,12 @@
                     "message": { "type": "string" },
                     "answer": { "$ref": "#/components/schemas/Answer" }
                   }
-                },
-                "example": {
-                  "message": "Javob qabul qilindi",
-                  "answer": {
-                    "_id": "660f123456789abcde123def",
-                    "quizId": "660f123456789abcde123456",
-                    "teamId": "660f123456789abcde123789",
-                    "questionId": "660f123456789abcde123abc",
-                    "answer": "4",
-                    "isCorrect": null
-                  }
                 }
               }
             }
           },
           "403": {
-            "description": "Quiz is not active",
+            "description": "Team not found or not joined to the quiz",
             "content": {
               "application/json": {
                 "schema": {
@@ -379,7 +882,7 @@
             }
           },
           "404": {
-            "description": "Quiz not found",
+            "description": "Quiz or question not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -467,6 +970,18 @@
     }
   },
   "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      },
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    },
     "schemas": {
       "Quiz": {
         "type": "object",
@@ -496,7 +1011,8 @@
           "_id": { "type": "string" },
           "quizId": { "type": "string" },
           "text": { "type": "string" },
-          "timeLimit": { "type": "number" }
+          "timeLimit": { "type": "number" },
+          "points": { "type": "number" }
         }
       },
       "Answer": {
@@ -530,7 +1046,8 @@
         "properties": {
           "quizCode": { "type": "string" },
           "questionText": { "type": "string" },
-          "timeLimit": { "type": "number" }
+          "timeLimit": { "type": "number" },
+          "points": { "type": "number" }
         },
         "required": ["quizCode", "questionText", "timeLimit"]
       },
